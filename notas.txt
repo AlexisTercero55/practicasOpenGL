@@ -1,0 +1,298 @@
+8/26/21
+Alexis Tercero: https://github.com/AlexisTercero55
+                alexistercero55@gmail.com
+
+En este repositorio se alojan las practicas OpenGL de la clase de
+Graficación por Computadora Grupo:1752-Vargas Castro Daniel (UNAM/MAC).
+
+Como base se usa el commit:  636350f
+del repositorio https://github.com/AlexisTercero55/setupOpenGL
+
+OpenGL: version 2.1
+
+Caso: Uso basico de OpenGL y FreeGlut.
+
+Descripcion: 
+    Creacion y algunas configuraciones de ventanas Glut/FreeGlut.
+    Generacion del entorno interactivo con las ventanas de Glut/FreeGlut.
+    Introduccion a las primitivas de graficacion por computadora (OpenGL):
+        Puntos (vertices).
+        Lineas (aristas).
+        Poligonos.
+    Generacion de primitivas en una plicacion de C con OpenGL y FreeGlut.
+
+Visual Studio Code @\.vscode:
+    task.json: Define una tarea de compilacion que se activa con ctrl + shift + b
+               ademas manda los binarios a una carpeta especial llamada 'ejecutables'
+               que sera ignorada por git mediante .gitignore
+
+               ADVERTENCIAS: En el remoto no se incluye la carpeta 'ejecutables'
+                             usted debera crearla para evitar errores en la tarea de compilacion 
+                             task.json @ ln: 12
+                             o en su defecto modificar el script a sus necesidades.
+    
+    launch.json: Define la tarea de debugging que se activa con f5.
+
+Codigos:
+    plantillaNotas.c    :   Explicacion general
+    plantilla.c         :   CONFIGURACION BASICA DE UNA APLICACION DE OpenGL y FreeGlut
+    main.c              :   Implementacion de graficos 2D con OpenGL y FreeGlut.
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+CLASE 2D   8/26/21 
+
+                GENERACIÓN DE PUNTOS, LÍNEAS Y POLÍGONOS
+              TEORÍA Y APLICACIÓN CON PRIMITIVAS DE OPENGL
+
+TIPOS DE DATO DE OpenGL:
+    Para mayor portabilidad, OpenGL define sus propios tipos de dato, 
+    que en general son compatibles con los tipos estándar del lenguaje C.
+
+    GLboolean   1   GL_TRUE, GL_FALSE
+    GLint       32  entero con signo en complemento a 2
+    GLfloat     32  IEEE-754
+    GLdouble    64  IEEE-754
+    GLenum      32  ENUMERACIONES
+
+    https://www.khronos.org/opengl/wiki/OpenGL_Type
+
+ENTORNO DE DIBUJO EN OPENGL:
+    glBegin y glEnd delimitan los vértices que definen una primitiva 
+    o un grupo de primitivas similares.
+
+    INDICAR A OpenGL EL INICIO DE UN DIBUJO CON PRIMITIVAS:
+        void glBeging(GLenum mode);
+
+        glBegin acepta un único argumento que especifica en cuál de las diez formas 
+        se interpretan los vértices.
+
+        GLenum mode:
+            Especifica la primitiva o primitivas que se crearán a partir de los vértices 
+            presentados entre glBegin y el glEnd. EXISTEN 10 MODOS (CONSTANTES SIMBOLICAS)
+            
+            Tomando 'n' como un número entero que comienza en 1 y 
+            'N' como el número total de vértices especificados, 
+            las interpretaciones son las siguientes.
+            mode :
+                GL_POINTS           :   Trata cada vértice como un solo punto. 
+                                        El vértice n define el punto n. Se dibujan N puntos.
+                GL_LINES            :   Trata cada par de vértices como un segmento de línea independiente. 
+                                        Los vértices 2n-1 y 2n definen la línea n. Se dibujan N/2 líneas. 
+                GL_LINE_STRIP       :   Dibuja un grupo conectado de segmentos de línea 
+                                        desde el primer vértice hasta el último. 
+                                        Los vértices n y n + 1 definen la línea n. Se dibujan N - 1 líneas.
+                GL_LINE_LOOP        :   Dibuja un grupo conectado de segmentos de línea desde el primer vértice hasta el último 
+                                        y luego de regreso al primero. Los vértices n y n + 1 definen la línea n.
+                                        Sin embargo, la última línea está definida por los vértices N y 1. Se dibujan N líneas.
+                GL_TRIANGLES        :   Trata cada triplete de vértices como un triángulo independiente. 
+                                        Los vértices 3n-2, 3n-1 y 3n definen el triángulo n. Se dibujan N/3 triángulos.
+                GL_TRIANGLE_STRIP   :   Dibuja un grupo de triángulos conectados. Se define un triángulo para cada vértice 
+                                        presentado después de los dos primeros vértices. 
+                                        Para n impar, los vértices n, n + 1 y n + 2 definen el triángulo n. 
+                                        Para n pares, los vértices n + 1, n y n + 2 definen el triángulo n. 
+                                        Se dibujan N - 2 triángulos.
+                GL_TRIANGLE_FAN     :   Dibuja un grupo de triángulos conectados. Se define un triángulo para cada vértice 
+                                        presentado después de los dos primeros vértices. Los vértices 1, n + 1 y n + 2 
+                                        definen el triángulo n. Se dibujan N - 2 triángulos.
+                GL_QUADS            :   Trata cada grupo de cuatro vértices como un cuadrilátero independiente. 
+                                        Los vértices 4 ⁢ n - 3, 4 ⁢ n - 2, 4 ⁢ n - 1 y 4 ⁢ n definen el cuadrilátero n. 
+                                        Se dibujan N 4 cuadriláteros.
+                GL_QUAD_STRIP       :   Dibuja un grupo conectado de cuadriláteros. Se define un cuadrilátero para cada par de vértices 
+                                        presentado después del primer par. Los vértices 2 ⁢ n - 1, 2 ⁢ n, 2 ⁢ n + 2 y 2 ⁢ n + 1 
+                                        definen el cuadrilátero n. Se dibujan N 2 - 1 cuadriláteros. 
+                                        Tenga en cuenta que el orden en el que se usan los vértices para construir 
+                                        un cuadrilátero a partir de datos de franjas es diferente del que se usa con datos independientes.
+                GL_POLYGON          :   Dibuja un único polígono convexo. Los vértices del 1 al N definen este polígono.
+
+            Las líneas, triángulos, cuadriláteros y polígonos que no se especifican por completo 
+            no se dibujan
+
+            La especificación mínima de vértices para cada primitiva es la siguiente: 
+                1 para un punto, 
+                2 para una línea, 
+                3 para un triángulo, 
+                4 para un cuadrilátero,
+                3 para un polígono. 
+            Los modos que requieren cierto múltiplo de vértices son: 
+                GL_LINES (2), 
+                GL_TRIANGLES (3), 
+                GL_QUADS (4) y 
+                GL_QUAD_STRIP (2).
+
+    INDICAR A OpenGL EL FINAL DE UN DIBUJO CON PRIMITIVAS:
+        void glEnd();
+    
+    INDICAR A OpenGL QUE REALICE LOS DIBUJOS PREVIAMENTE DEFINIDOS ENTRE 
+    LAS FUNCIONES glBegin y glEnd, PUEDEN SER VARIOS DIBUJOS:
+        void glFinish(void);
+    
+    BORRAR EL DUBUJO ANTERIOR   <<glClear>>:
+        Borrar búferes a valores preestablecidos.
+
+        void glClear(GLbitfield mask);
+
+        GLbitfield mask (indican los búferes que se borrarán):
+            GL_COLOR_BUFFER_BIT     :   Indica los búferes actualmente habilitados para la escritura en color.
+            GL_DEPTH_BUFFER_BIT     :   Indica el búfer de profundidad.
+            GL_ACCUM_BUFFER_BIT     :   Indica el búfer de acumulación.
+            GL_STENCIL_BUFFER_BIT   :   Indica el búfer de la plantilla.
+        Si no hay un búfer, entonces un glClear dirigido a ese búfer no tiene ningún efecto.
+
+        EJ: glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        REFERENCIA: https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glClear.xml (LEYENDO REPASO NECESARIO)
+    
+    ADVERTENCIAS:
+        Solo se puede usar un subconjunto de comandos GL entre glBegin y glEnd. 
+        Los comandos son: 
+            glVertex, 
+            glColor, 
+            glSecondaryColor, 
+            glIndex, 
+            glNormal, 
+            glFogCoord, 
+            glTexCoord, 
+            glMultiTexCoord, 
+            glVertexAttrib, 
+            glEvalCoord, 
+            glEvalPoint, 
+            glArrayElement, 
+            glMaterial y 
+            glEdgeFlag. 
+        Además, es aceptable usar glCallList o glCallLists para ejecutar listas de visualización 
+        que incluyen solo los comandos anteriores. Si se ejecuta cualquier otro comando GL entre glBegin y glEnd, 
+        se establece el indicador de error y se ignora el comando.
+
+        OpenGL no tiene forma de saber cuándo debe redibujar 
+        los contenidos en la ventana. Para hacer esto, se debe solicitar a GLUT, 
+        que ejecute nuevamente la función glutDisplayFunc mediante la función:
+            void glutPostRedisplay(void);
+        NOTA: ESTO LO HACE EL MANEJADOR DE VENTANS, EN ESTE CASO FREEGLUT.
+    
+    IMPLEMTACION DE ENTORNO DE DIBUJO OpenGL EN C:
+        glBegin(GLenum mode); //DEFINE UN DIBUJO
+            /*ponga aqui sus primitivas OpenGL
+              No hay límite para el número de vértices que se pueden definir entre glBegin y glEnd.
+            */
+        glEnd();// TERMINA EL DIBUJO
+        glFinish();//ACCION DIBUJAR (PARA OpenGL)
+
+    REFERENCIA:
+        https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glBegin.xml (leido hasta errores)
+
+    Si no se define una cámara, cada coordenada puede estar en un rango de [−1, 1].
+
+Colores en primitivas <<glColor>>:
+    glColor establece un nuevo color RGBA de cuatro valores.
+
+    Cambiar el color (EXISTEN MAS FUNCIONES):
+        void glColor3f(GLfloat red, GLfloat green, GLfloat blue); [0,1]
+        void glColor4f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+
+    PRINCIPALES VARIANTES DE glColor:
+        glColor3 : RECIBEN 3 PARAMETROS (RGB)
+        glColor3 : RECIBEN 4 (RGBA)
+
+        OTRAS QUE RECIBEN EL PUNTERO A UN ARREGLO CON LOS VALORES:
+            void glColor4fv(const GLfloat * v);
+    
+    Associated Gets
+    glGet with argument GL_CURRENT_COLOR
+    glGet with argument GL_RGBA_MODE
+
+    REFERENCIA: https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glColor.xml (LEYENDO, REPASO OPCIONAL)
+
+ESTADOS DE OpenGL:  OpenGL FUNCIONA COMO UNA MAQUINA DE ESTADOS. 
+    Pasar puntero de funcion con instrucciones de dibujo:
+        The new display callback function.
+
+        DEFINICION:
+            void glutDisplayFunc(void (*func)(void));
+
+            Establece la devolución de llamada de pantalla para la ventana actual.
+    
+        DESCRIPCION:
+            Cuando GLUT determina que es necesario volver a visualizar el plano normal 
+            de la ventana, se llama a la devolución de llamada de visualización de la ventana.
+
+            Antes de la devolución de llamada, la ventana actual se establece en la ventana 
+            que debe volver a mostrarse y 
+            (si no se registra ninguna devolución de llamada de visualización superpuesta), 
+            la capa en uso se establece en el plano normal.
+
+        REFERENCIA: https://www.opengl.org/resources/libraries/glut/spec3/node46.html (LEYENDO : REPASO NESESARIO)
+
+    Indicar que dibuje a OpenGL glFinish:
+        glFinish no regresa hasta que se completan los efectos 
+        de todos los comandos GL previamente llamados. 
+        Dichos efectos incluyen todos los cambios en el estado GL, 
+        todos los cambios en el estado de la conexión y 
+        todos los cambios en el contenido del búfer de tramas (frame buffer).
+
+        DEFINICION:
+            void glFinish(	void);
+        
+        REFERENCIA: https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glFinish.xhtml
+
+    Indicar al sistema que despliegue.
+        Marca la ventana actual que necesita volver a mostrarse.
+
+        DEFINICION:
+            void glutPostRedisplay(void);
+        
+        DESCRIPCION:
+            Marque el plano normal de la ventana actual que necesita volver a mostrarse.
+            En la siguiente iteración a través de glutMainLoop, se llamará a la devolución 
+            de llamada de visualización de la ventana para volver a visualizar el plano 
+            normal de la ventana.
+
+            Varias llamadas a glutPostRedisplay antes de la próxima oportunidad de devolución 
+            de llamada de pantalla genera solo una única devolución de llamada de visualización. 
+            glutPostRedisplay se puede llamar dentro de la pantalla de una ventana o la devolución 
+            de llamada de la pantalla superpuesta para volver a marcar esa ventana para volver a 
+            mostrarla.
+        
+        REFERENCIA: https://www.opengl.org/resources/libraries/glut/spec3/node20.html
+
+OBJETOS 2D BASICOS (PRIMITIVAS):
+    POLIGONO
+    ARISTA
+    VERTICE
+
+VERTICES 2D EN OpenGL:
+    DEFINICION:
+        void glvertex2f(GLfloat, GLfloat);
+        Ej: glVertex2f(-0.5, 0.3);
+
+    si no se define una camara, cada coordenada debe estar en [-1,1].
+
+    GLenum mode : GL_POINTS
+
+    Especificar el diámetro de los puntos rasterizados:
+        void glPointSize(GLfloat size); // DEFAULT size = 1
+    
+    IMPLEMENTACION EN C:
+        glBegin(GL_POINTS);
+            glVertex2f(x1, y1);
+            glVertex2f(x2, y2);
+            //...
+            glVertex2f(xn, yn);
+        glEnd();
+
+LINEAS EN OpenGL:   VOID glBeging(GLenum mode);
+    GLenum mode
+        GL_LINES
+        GL_LINE_STRIP
+        GL_LINE_LOOP
+
+POLIGONOS EN OpenGL:    VOID glBeging(GLenum mode);
+    CONVENCION DE DEFINICION DE VERTICES EN POLIGONOS (CCW)
+    CCW : COUNTER CLOCK WISE
+
+    GLenum mode 
+        GL_TRIANGLES
+        GL_TRIANGLE_STRIP
+        GL_TRIANGLE_FAN
+        GL_QUADS
+        GL_QUAD_STRIP
+        GL_POLYGON  :   POLIGONO CONVEXO
