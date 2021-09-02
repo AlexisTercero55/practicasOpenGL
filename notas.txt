@@ -1,12 +1,11 @@
-8/26/21
+9/1/21          alexistercero55@gmail.com
 Alexis Tercero: https://github.com/AlexisTercero55
-                alexistercero55@gmail.com
+                
 
 En este repositorio se alojan las practicas OpenGL de la clase de
 Graficación por Computadora Grupo:1752-Vargas Castro Daniel (UNAM/MAC).
 
-Como base se usa el commit:  636350f
-del repositorio https://github.com/AlexisTercero55/setupOpenGL
+Tarea 1 : Uso de primitivas de dibujo en OpenGL
 
 OpenGL: version 2.1
 
@@ -33,10 +32,20 @@ Visual Studio Code @\.vscode:
     
     launch.json: Define la tarea de debugging que se activa con f5.
 
-Codigos:
-    plantillaNotas.c    :   Explicacion general
-    plantilla.c         :   CONFIGURACION BASICA DE UNA APLICACION DE OpenGL y FreeGlut
-    main.c              :   Implementacion de graficos 2D con OpenGL y FreeGlut.
+ARCHIVOS:
+    TAREA1.c    :   Programa en lenguaje C/C++ que inicializará
+                    una ventana de GLUT/FreeGLUT donde se desplegarán dibujos 2D de 
+                    letras AUT: Alexis Uriel, cada una con un color diferente.
+
+                    Mientras se ejecuta el programa, el usuario podrá presionar teclas en su teclado,
+                    esperando ver una respuesta en el programa de acuerdo con:
+                        TECLA 1:    Las iniciales se dibujan con puntos
+                        TECLA 2:    Las iniciales se dibujan con líneas
+                        TECLA 3:    Las iniciales se dibujan con polígonos
+                        TECLA ESC:  Termina el programa
+                        TECLA OTRA: No pasa nada
+    TAREA1.tex  :   Plantilla de LaTex para futuras entregas.
+    help.png    :   Imagen de referencia para calcular los puntos de los dibujos en TAREA1.c
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 CLASE 2D   8/26/21 
