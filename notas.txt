@@ -1,24 +1,15 @@
 9/1/21          alexistercero55@gmail.com
 Alexis Tercero: https://github.com/AlexisTercero55
-                
 
 En este repositorio se alojan las practicas OpenGL de la clase de
 Graficación por Computadora Grupo:1752-Vargas Castro Daniel (UNAM/MAC).
 
-Tarea 1 : Uso de primitivas de dibujo en OpenGL
+Mensage de commit: 3D : PERCEPCIÓN DE PROFUNDIDAD Y TODO LO QUE IMPLICA.
 
 OpenGL: version 2.1
 
-Caso: Uso basico de OpenGL y FreeGlut.
-
-Descripcion: 
-    Creacion y algunas configuraciones de ventanas Glut/FreeGlut.
-    Generacion del entorno interactivo con las ventanas de Glut/FreeGlut.
-    Introduccion a las primitivas de graficacion por computadora (OpenGL):
-        Puntos (vertices).
-        Lineas (aristas).
-        Poligonos.
-    Generacion de primitivas en una plicacion de C con OpenGL y FreeGlut.
+Caso: DESARROLLO DE UN ENTORNO DE TRABAJO (BASICO) PARA GRAFICOS 3D
+      CON OPENGL Y FREEGLUT.
 
 Visual Studio Code @\.vscode:
     task.json: Define una tarea de compilacion que se activa con ctrl + shift + b
@@ -33,25 +24,15 @@ Visual Studio Code @\.vscode:
     launch.json: Define la tarea de debugging que se activa con f5.
 
 ARCHIVOS:
-    TAREA1.c    :   Programa en lenguaje C/C++ que inicializará
-                    una ventana de GLUT/FreeGLUT donde se desplegarán dibujos 2D de 
-                    letras AUT: Alexis Uriel, cada una con un color diferente.
-
-                    Mientras se ejecuta el programa, el usuario podrá presionar teclas en su teclado,
-                    esperando ver una respuesta en el programa de acuerdo con:
-                        TECLA 1:    Las iniciales se dibujan con puntos
-                        TECLA 2:    Las iniciales se dibujan con líneas
-                        TECLA 3:    Las iniciales se dibujan con polígonos
-                        TECLA ESC:  Termina el programa
-                        TECLA OTRA: No pasa nada
-    TAREA1.tex  :   Plantilla de LaTex para futuras entregas.
-    help.png    :   Imagen de referencia para calcular los puntos de los dibujos en TAREA1.c
+    plantilla3D.c   PLATILLA PARA TRABAJAR EN 3D CON OPENGL Y FREEGLUT
+    main.c          version propia de la plantida3D.c con anotaciones y agregados.
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 CLASE 2D   8/26/21 
-
+-------------------------------------------------------------------------------------
                 GENERACIÓN DE PUNTOS, LÍNEAS Y POLÍGONOS
               TEORÍA Y APLICACIÓN CON PRIMITIVAS DE OPENGL
+-------------------------------------------------------------------------------------
 
 TIPOS DE DATO DE OpenGL:
     Para mayor portabilidad, OpenGL define sus propios tipos de dato, 
@@ -305,3 +286,323 @@ POLIGONOS EN OpenGL:    VOID glBeging(GLenum mode);
         GL_QUADS
         GL_QUAD_STRIP
         GL_POLYGON  :   POLIGONO CONVEXO
+///////////////////////////////////////////////////////////////////////////////////////////////////
+CLASE OpenGL 8/31/21 
+**DOCUMENTAR EL PIPELINE DE RENDERIZADO Y LAS PROYECCIONES
+**DOCUMENTAR glViewport
+**VOLUMEN DE RENDERIZADO
+---------------------------------------------------------------------------------
+            PERCEPCIÓN DE PROFUNDIDAD EN UNA IMAGEN PLANA
+    IMPLEMENTACIÓN MEDIANTE CÁMARAS, LUCES Y BUFFERS EN GLUT/FREEGLUT
+---------------------------------------------------------------------------------
+
+PERCEPCIÓN DE PROFUNDIDAD:
+    Los efectos de profundidad se realizan en los procesos de 
+    “Iluminación” y “Proyección” en el paso de “Geometría” del 
+    pipeline de renderizado.
+
+    SE NECESITA CONFIGURAR UNA PROYECCION EN PERSPECTIVA
+    En la proyección en perspectiva, el volumen de recorte es una
+    pirámide trunca (frustum), por lo que los objetos más lejanos a la
+    cámara se ven más pequeños en la proyección al plano.
+
+PROYECIONES: 
+    Por defecto, OpenGL tiene configurada una matriz para hacer cambios directamente 
+    en la escena 3D (mundo), por lo que antes de empezar a configurar la cámara, 
+    es necesario avisarle que se harán cambios a la matriz de proyección y cargarle 
+    una matriz identidad inicial con las funciones:
+
+    MATRIZ DE PROYECCION:
+        void glMatrixMode(GLenum mode);
+            
+            Especificar qué matriz es la matriz actual.
+
+            PARAMETROS: (GLenum mode)
+                Especifica qué pila de matrices es el destino de las operaciones 
+                de matriz posteriores. 
+                Se aceptan tres valores
+                GLenum mode :
+                    GL_MODELVIEW, 
+                    GL_PROJECTION,
+                    GL_TEXTURE. 
+                El valor inicial es GL_MODELVIEW. Además, si se admite la extensión 
+                ARB_imaging, también se acepta GL_COLOR.
+            
+            DESCRIPCION:
+                glMatrixMode: Establece el modo de matriz actual. 
+                              modo puede asumir uno de cuatro valores:
+
+                GL_MODELVIEW
+                Aplica las operaciones de matriz subsiguientes a la pila de matrices de modelview.
+                    pila de matrices de modelview:
+                        MATRIZ DE MODELO : COORDENADAS LOCALES A COORDENADAS DE MUNDO.
+                        MATRIZ DE VISTA : ESPACIO A CAMARA
+
+                GL_PROJECTION
+                Aplica operaciones de matriz posteriores a la pila de matrices de proyección.
+
+                GL_TEXTURE
+                Aplica las operaciones de matriz subsiguientes a la pila de matriz de textura.
+
+                GL_COLOR
+                Aplica las operaciones de matriz subsiguientes a la pila de matrices de colores.
+
+                Para averiguar qué pila de matrices es actualmente el objetivo de todas 
+                las operaciones de matrices, llame a glGet con el argumento GL_MATRIX_MODE. 
+                El valor inicial es GL_MODELVIEW.
+                    glGet(GL_MATRIX_MODE);
+                
+                NOTAS ADICIONALES DE LA PILA DE MATRICES (O VALORES DE GLenum mode):
+                    The model, view and projection matrices are three separate matrices. 
+                    Model maps from an object's local coordinate space into world space, 
+                    view from world space to camera space, projection from camera to screen.
+                    
+                    If you compose all three, you can use the one result to map all the way 
+                    from object space to screen space, making you able to work out what you 
+                    need to pass on to the next stage of a programmable pipeline from the 
+                    incoming vertex positions.
+                    
+                    In the fixed functionality pipelines of old, you'd apply model and view together, 
+                    then work out lighting using another result derived from them (with some fixes so 
+                    that e.g. normals are still unit length even if you've applied some scaling to the 
+                    object), then apply projection. You can see that reflected in OpenGL, which never 
+                    separates the model and view matrices — keeping them as a single modelview matrix 
+                    stack. You therefore also sometimes see that reflected in shaders.
+                    
+                    So: the composed model view projection matrix is often used by shaders to map from 
+                    the vertices you loaded for each model to the screen. It's not required, there are 
+                    lots of ways of achieving the same thing, it's just usual because it allows all 
+                    possible linear transforms. Because of that, a lesser composed version of it was 
+                    also the norm in ye olde fixed pipeline world.
+
+                    REFERENCIA: https://stackoverflow.com/questions/5550620/the-purpose-of-model-view-projection-matrix
+
+            REFERENCIA: https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glMatrixMode.xml (repaso obligado)
+
+        void glLoadIdentity(void);
+
+            Reemplazar la matriz actual con la matriz de identidad.
+
+            glLoadIdentity replaces the current matrix with the identity matrix. 
+            It is semantically equivalent to calling glLoadMatrix with the identity matrix
+                1 0 0 0 
+                0 1 0 0 
+                0 0 1 0 
+                0 0 0 1
+            but in some cases it is more efficient.
+
+            REFERENCIA: https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glLoadIdentity.xml (REPASO OBLIGADO)
+
+    ORTOGONAL:
+        ES LA PROYECCION POR DEFECTO.
+        SU VOLUMEN DE RECORTE ES UNA CAJA QUE VA  DE -1 A 1.
+
+        CONFIGURACION:
+            Multiplicar la matriz actual con una matriz ortográfica.
+
+            void glOrtho(   GLdouble left,
+                            GLdouble right,
+                            GLdouble bottom,
+                            GLdouble top,
+                            GLdouble nearVal,
+                            GLdouble farVal);
+            
+            PARAMETROS (VOLUMEN DE RECORTE):
+                left, right:
+                    Specify the coordinates for the left and right 
+                    vertical clipping planes.
+
+                bottom, top
+                    Specify the coordinates for the bottom and top 
+                    horizontal clipping planes.
+
+                nearVal, farVal
+                    Specify the distances to the nearer and farther 
+                    depth clipping planes. These values are negative 
+                    if the plane is to be behind the viewer.
+        
+        REFERENCIA: https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glOrtho.xml (REPASO OBLIGATORIO)
+
+    PERSPECTIVA:
+        Multiplicar la matriz actual por una matriz de perspectiva
+
+        void glFrustum(	GLdouble left,
+                        GLdouble right,
+                        GLdouble bottom,
+                        GLdouble top,
+                        GLdouble nearVal,
+                        GLdouble farVal);
+        
+            PARAMETROS (VOLUMEN DE RECORTE):
+                left, right:
+                Specify the coordinates for the left and right 
+                vertical clipping planes.
+
+                bottom, top
+                Specify the coordinates for the bottom and top 
+                horizontal clipping planes.
+
+                nearVal, farVal
+                Specify the distances to the near and far depth clipping planes. 
+                Both distances must be positive.
+
+            REFERENCIA: https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glFrustum.xml (REPASO OBLIGATORIO)
+
+        ADVERTENCIAS: 
+            ESPECIFICAR EL VOLUMEN DE RECORTE ES COMPLICADO DADA LA NATURALEZA
+            DE SU FORMA (UNA PIRAMIDE TRUNCA), RESULTA DIFICIAL SABER CUAL SERA EL
+            RESULTADO AL ESPECIFICAR VALORES A glFrustum.
+
+        USO DE GLU (OPENGL UTILITY) PARA CONFIGURAR LA PROYECCION EN PERSPECTIVA
+        DE UNA MANERA MAS SENCILLA.
+        CONFIGURACION:
+            Configurar una matriz de proyección en perspectiva.
+
+            void gluPerspective(GLdouble fovy,
+                                GLdouble aspect,
+                                GLdouble zNear,
+                                GLdouble zFar);
+
+            PARAMETROS:
+                fovy
+                Specifies the field of view angle, in degrees, in the y direction.
+
+                aspect
+                Specifies the aspect ratio that determines the field of view in the 
+                x direction. The aspect ratio is the ratio of x (width) to y (height).
+
+                    Resolución pixeles (ancho × alto)   aspect  Uso
+                    640×480 (SD), 800×600,              1.33    Estándar de televisión SD y 
+                    1440×1080, 1920×1440                (4:3)   algunos monitores “cuadrados”
+                    
+                    1280×720 (HD), 1366×768,            1.77    Estándar de televisión actual y
+                    1920×1080 (FHD), 3840×2160 (4K)     (16:9)  algunos celulares.
+                    
+                zNear
+                Specifies the distance from the viewer to the near clipping plane 
+                (always positive).
+
+                zFar
+                Specifies the distance from the viewer to the far clipping plane 
+                (always positive).
+            
+            REFERENCIA: https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluPerspective.xml (REPASO OBLIGATORIO)
+
+    ADVERTENCIAS:
+        SOLO SE LLAMAN LAS FUNCIONES DE PROYECCION CADA CAMBIO DE CAMARA.
+            
+CAMARA:
+    POSICIONAMIENTO CON GLU:
+        Definir una transformación de visualización.
+
+        void gluLookAt(	GLdouble eyeX,
+                        GLdouble eyeY,
+                        GLdouble eyeZ,
+                        GLdouble centerX,
+                        GLdouble centerY,
+                        GLdouble centerZ,
+                        GLdouble upX,
+                        GLdouble upY,
+                        GLdouble upZ);
+        
+        PARAMETROS: (EN COORDENADAS DE MUNDO)
+            eyeX, eyeY, eyeZ
+            Specifies the position of the eye point.
+
+            centerX, centerY, centerZ
+            Specifies the position of the reference point.
+
+            upX, upY, upZ
+            Specifies the direction of the up vector.
+        
+        REFERENCIA: https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluLookAt.xml (REPASO OBLIGATORIO)
+
+ILUMINACION:
+    ACTIVAR ILUMINACION:
+        habilitar o deshabilitar las capacidades de GL del lado del servidor.
+
+        void glEnable(GLenum cap);
+
+            PARAMETROS: cap
+                Especifica una constante simbólica que indica una capacidad GL.
+
+                GL_LIGHTING     //ILUMINACION GENERAL
+                    EL VALOR NECESARIO PARA ACTIVAR LA ILUMINACION.
+
+                GL_LIGHTi       //TIPO ESPECIFICO DE ILUMINACION
+                    Si está habilitado, incluya la luz i en la evaluación de 
+                    la ecuación de iluminación. Consulte glLightModel y glLight.
+
+                    i puede ser cualquier número del 0 al 7, correspondiente al 
+                    índice de la luz.
+            
+            DESCRIPCION:
+                glEnable y glDisable habilitan y deshabilitan varias capacidades.
+                Utilice glIsEnabled o glGet para determinar la configuración actual 
+                de cualquier capacidad. El valor inicial para cada capacidad con la 
+                excepción de GL_DITHER y GL_MULTISAMPLE es GL_FALSE.
+
+            REFERENCIA: (REPASO OBLIGADO)
+
+BUFFERS: EFICIENCIA EN RENDERIZADO
+    DE COLOR:   ALMACENA LOS COLOERS DE CADA PIXEL.
+    DE COLOR DOBLE: FRONTBUFFER, BACKBUFFER.
+    DE PROFUNDIDAD: Z-BUFFER CONTIENE LA PROFUNDIDAD DE CADA OBJETO EN LA ESCENA
+                    lO QUE NOS PERMITE SABER QUE OBJETOS SE DIBUJAN SOBRE OTROS
+                    (ELEGIR QUE RENDERIZAR).
+
+CONFIGURACION DE UNA CAMARA EN PERSPECTIVA CON GLU (#include <GL/glu.h>):
+    La siguiente función configura una proyección en perspectiva con un ángulo de apertura de 45°, 
+    una relación de aspecto calculada de acuerdo al tamaño de la ventana y 
+    planos de corte cercano y lejano en 0.1 y 1000, respectivamente. 
+    Posteriormente, se coloca una cámara en las coordenadas (0, 0, 10),
+    viendo hacia el centro del mundo (0, 0, 0) y sin rotación (up = (0, 1, 0)).
+
+    void camara(void)
+    {
+        float ancho = GLUT_WINDOW_WIDTH;
+        float alto = GLUT_WINDOW_HEIGHT;
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        gluPerspective(45, ancho/alto, 0.1, 1000);
+        gluLookAt(0, 0, 10, 0, 0, 0, 0, 1, 0);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+    }
+
+    Solo se configura la camara en cada cambio de camara
+
+CONFIGURACION DE BUFFERS DE GLUT/FREEGLUT:
+
+    INICIALIZAR UNA VENTANA CON BUFFERS
+    void glutInitDisplayMode(unsigned int mode);
+
+        establece el modo de visualización inicial.
+
+        unsigned int mode:
+            Modo de visualización, normalmente la operación OR bit a bit 
+            de las máscaras de bits del modo de visualización GLUT. 
+            Consulte los valores a continuación
+
+            GLUT_RGBA
+            GLUT_DOUBLE
+            GLUT_DEPTH
+    
+    REFERENCIA: https://www.opengl.org/resources/libraries/glut/spec3/node12.html (REPASO OBLIGADO**)
+
+habilitar o deshabilitar las capacidades de GL del lado del servidor.
+
+    void glEnable(GLenum cap);
+
+        PARAMETROS: cap
+            Especifica una constante simbólica que indica una capacidad GL.
+
+            EL VALOR NECESARIO PARA ACTIVAR LA ILUMINACION ES: GL_LIGHTING.
+        
+        DESCRIPCION:
+            glEnable y glDisable habilitan y deshabilitan varias capacidades.
+            Utilice glIsEnabled o glGet para determinar la configuración actual 
+            de cualquier capacidad. El valor inicial para cada capacidad con la 
+            excepción de GL_DITHER y GL_MULTISAMPLE es GL_FALSE.
+
+        REFERENCIA: https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glEnable.xml (REPASO OBLIGADO)
