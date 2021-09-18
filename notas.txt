@@ -4,7 +4,7 @@ Alexis Tercero: https://github.com/AlexisTercero55
 En este repositorio se alojan las practicas OpenGL de la clase de
 Graficación por Computadora Grupo:1752-Vargas Castro Daniel (UNAM/MAC).
 
-Mensage de commit: OBJETOS 3D : MALLAS POLIGONALES.
+Mensage de commit: TRANSFORMACIONES AFINES TEORIA.
 
 OpenGL: version 2.1
 
@@ -23,6 +23,7 @@ Visual Studio Code @\.vscode:
     launch.json: Define la tarea de debugging que se activa con f5.
 
 ARCHIVOS:
+    **
     clase.c     Codigo generado a partir de la clase.
     profe.c     CODIGO DE MUESTRA PUBLICADO POR EL PROFESOR Vargas Castro Daniel.
 
@@ -788,3 +789,227 @@ DISCRETIZACIÓN DE UN TOROIDE
         x_i = (R + r\cos\alpha_i)\cos\beta_i
         y_i = (R + r\cos\alpha_i)\sen\beta_i
         z_i = r\sin\alpha_i
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+CLASE 9/7/21 Graficación por Computadora con OpenGL <<terminar apuntes de presentacion antes del commit>>
+**actual commit 
+**como sustituyen las operaciones con coordenadas homogeneas a las transformaciones afines?
+**https://www.youtube.com/watch?v=WDIkqP4JbkE
+---------------------------------------------------------------------------------
+                   TRANSFORMACIONES GEOMETRICAS
+TRANSFORMACIONES AFINES: TRASLACION, ROTACION, ESCALAMIENTO, SESGO Y REFLEXION
+---------------------------------------------------------------------------------
+
+TRANSFORMACIONES:
+    DAR SENSACION DE MOVIMIENTO.
+
+    TRANSFORMACION AFIN (ALGEBRA LINEAL):
+        Una transformación afín en un espacio euclídeo (R^2,R^3) es una transformación que 
+        preserva:
+            la colinealidad, 
+            la coplanaridad 
+            las razones de las distancias entre puntos a lo largo de una línea.
+
+        Pragmáticamente, consisten en una transformación lineal seguida de una traslación 
+        y se suele representar de la siguiente forma:
+
+            T:X\to AX + B
+
+            Y = AX + B
+
+            donde:
+                Y : el punto mapeado en el nuevo conjunto.
+                X : el punto original que se desea mapear.
+                A : una matriz de transformación.
+                B : un vector de traslación
+
+    CONVENCIONES:
+        LOS VERTICES SE ENTINDEN COMO VECTORES COLUMNA.
+
+TRANSFORMACIONES AFINES:
+    TRASLACION:
+        Y = X + B
+    
+    ROTACION:
+        ES cambio de orientación de un cuerpo o un sistema de referencia
+        de forma que una línea, llamada eje de rotación, permanece fijo.
+
+        2D:
+            R(\theta) = \begin{pmatrix}
+                            \cos\theta & -\sin\theta\\
+                            \sin\theta & \cos\theta
+                        \end{pmatrix}
+
+            DONDE \theta es el ángulo en grados en que se desea rotar el plano.
+        
+        3D: (Es necesario especificar el eje de rotación)
+            R_x(\theta) = \begin{pmatrix}
+                            1 &      0     &    0       \\
+                            0 & \cos\theta & -\sin\theta\\
+                            0 & \sin\theta & \cos\theta
+                          \end{pmatrix}
+
+            R_y(\theta) = \begin{pmatrix}
+                            \cos\theta  & 0 & \sin\theta \\
+                                0       & 1 &    0       \\
+                            -\sin\theta & 0 & \cos\theta
+                          \end{pmatrix}
+            
+            R_z(\theta) = \begin{pmatrix}
+                            \cos\theta & -\sin\theta & 0 \\
+                            \sin\theta &  \cos\theta & 0 \\
+                                0      &        0    & 1
+                          \end{pmatrix}
+    
+    ESCALAMIENTO:
+        Es el incremento o disminución del tamaño de un cuerpo.
+
+        2D:
+            S = \begin{pmatrix}
+                    S_x &  0\\
+                     0  & S_y
+                \end{pmatrix}
+        
+        3D:
+            S = \begin{pmatrix}
+                    S_x &  0  &  0  \\
+                     0  & S_y &  0  \\
+                     0  &  0  & S_z
+                \end{pmatrix}
+
+    REFLEXION:
+        2D:
+            La reflexión en 2D desplaza cada punto de un cuerpo usando una línea de reflexión,
+            tal que cada nuevo punto está a la misma distancia de dicha línea 
+            con respecto al punto original.
+
+            La matriz de reflexión sobre una línea arbitraria en la forma 𝑦 = 𝑚𝑥 es:
+
+                Ref = \frac{1}{1 + m^2}\begin{pmatrix}
+                                            1 - m^2 & 2m  \\
+                                              2m    & m^2
+                                       \end{pmatrix}
+            
+            De lo anterior se deduce que la reflexión sobre los ejes x y y,
+            se representan mediante las siguientes matrices:
+
+                Ref_x = \begin{pmatrix}
+                            1 &  0 \\
+                            0 & -1
+                        \end{pmatrix}
+                
+                Ref_y = \begin{pmatrix}
+                            -1 & 0 \\
+                             0 & 1
+                        \end{pmatrix}
+        
+        3D:
+            La reflexión en 3D desplaza cada punto de un cuerpo usando un plano de reflexión,
+            tal que cada nuevo punto está a la misma distancia de dicho plano 
+            con respecto al punto original.
+
+            La matriz de reflexión para cualquier plano que pasa por el origen,
+            con una normal unitaria 𝑁 = (𝑎, 𝑏, 𝑐) es:
+
+                Ref = \begin{pmatrix}
+                        1 - 2a^2 &  -2ab    &  -2ac \\
+                          -2ab   & 1 - 2b^2 &  -2bc \\
+                          -2ac   &  -2bc    & 1 - 2c^2
+                      \end{pmatrix}
+            
+            De lo anterior se deduce que la reflexión sobre los planos xy, yz y el xz, 
+            se representan mediante las siguientes matrices.
+
+                Ref_xy = \begin{pmatrix}
+                           1 & 0 & 0 \\
+                           0 & 1 & 0 \\
+                           0 & 0 & -1
+                         \end{pmatrix}
+                
+                Ref_yz = \begin{pmatrix}
+                           -1 & 0 & 0 \\
+                           0 & 1 & 0 \\
+                           0 & 0 & 1
+                         \end{pmatrix}
+                
+                Ref_xz = \begin{pmatrix}
+                           1 & 0 & 0 \\
+                           0 & -1 & 0 \\
+                           0 &  0& 1
+                         \end{pmatrix}
+
+COMPOSICIÓN DE TRANSFORMACIONES AFINES:
+    Es la aplicación de una serie de transformaciones una detrás de otra. 
+    Esto se suele representar mediante ecuaciones del tipo:
+
+        Y = A_1A_2\dots A_n + B_1 + \dots + B_n
+
+        ¡Recuerda que la multiplicación de matrices no es conmutativa!
+
+COORDENADAS HOMOGENEAS (GEOMETRIA PROYECTIVA):
+    Este sistema de coordenadas permite ampliar un espacio
+    euclídeo de dimensión 𝑛 a un espacio proyectivo de dimensión 𝑛 + 1. 
+        
+        T: R^n + R^(n+1)
+
+        Esta nueva dimensión representa un punto en el infinito
+        donde las línea paralelas se intersecan, dando una ilusión de perspectiva.
+    
+    Debido a sus propiedades matemáticas, las transformaciones
+    afines se pueden representar muy fácilmente con matrices, si se
+    utilizan coordenadas homogéneas
+
+    USO DE LAS COORDENADAS HOMOGÉNEAS
+    
+        SEA (x,y,z) entonces T(x,y,z) = (wx,wy,wz,w) 
+
+        donde 𝑤 suele tener un valor de 1 (0 es un punto en el infinito):
+
+            (𝑥, 𝑦, 𝑧, 1)
+
+    Las matrices de coordenadas homogeneas, optimizan las transformaciones afines.
+
+    La motivacion para estudiar coordenadas homogeneas es que OpenGL internamente
+    utiliza este tipo de coordenadas para realizar sus calculos de transformaciones.
+
+TRANSFORMACIONES AFINES CON COORDENADAS HOMOGÉNEAS:
+
+    Dada la transformacion afin:
+        
+        Y = AX + B
+
+    Las coordenadas homogéneas permiten representar cualquier transformación afín 
+    o composición de transformaciones mediante una sola multiplicación de matrices 
+    de la forma:
+
+        Y = AX
+
+TRANSFORMACIONES AFINES CON COORDENADAS HOMOGÉNEAS:
+
+    Traslacion:
+
+        A = \begin{pmatrix}
+                1 & 0 & 0 & T_x \\
+                0 & 1 & 0 & T_y \\
+                0 & 0 & 1 & T_z \\
+                0 & 0 & 0 &  1  
+            \end{pmatrix}
+    
+    cualquier matriz de transformación lineal en tres dimensiones se puede representar en
+    coordenadas homogéneas agregándole una fila y una columna de 0s, y un 1 como último
+    elemento de la diagonal principal. Ejemplo:
+
+        S = \begin{pmatrix}
+                    S_x &  0  &  0  \\
+                    0   & S_y &  0  \\
+                    0   &  0  & S_z
+            \end{pmatrix}
+
+        Se convierte en
+
+        S = \begin{pmatrix}
+                S_x &  0  &  0  &  0\\
+                0   & S_y &  0  &  0\\
+                0   &  0  & S_z &  0\\
+                0   &  0  &  0  &  1 
+            \end{pmatrix}
