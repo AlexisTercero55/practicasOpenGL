@@ -1,15 +1,14 @@
-9/1/21          alexistercero55@gmail.com
+9/18/21          alexistercero55@gmail.com
 Alexis Tercero: https://github.com/AlexisTercero55
 
 En este repositorio se alojan las practicas OpenGL de la clase de
 Graficación por Computadora Grupo:1752-Vargas Castro Daniel (UNAM/MAC).
 
-Mensage de commit: 3D : PERCEPCIÓN DE PROFUNDIDAD Y TODO LO QUE IMPLICA.
+Mensage de commit: OBJETOS 3D : MALLAS POLIGONALES.
 
 OpenGL: version 2.1
 
-Caso: DESARROLLO DE UN ENTORNO DE TRABAJO (BASICO) PARA GRAFICOS 3D
-      CON OPENGL Y FREEGLUT.
+Caso: GENERACION DE PRIMITIVAS GEOMETRICAS 3D CON OPENGL Y GLUT/FREEGLUT.
 
 Visual Studio Code @\.vscode:
     task.json: Define una tarea de compilacion que se activa con ctrl + shift + b
@@ -24,11 +23,45 @@ Visual Studio Code @\.vscode:
     launch.json: Define la tarea de debugging que se activa con f5.
 
 ARCHIVOS:
-    plantilla3D.c   PLATILLA PARA TRABAJAR EN 3D CON OPENGL Y FREEGLUT
-    main.c          version propia de la plantida3D.c con anotaciones y agregados.
+    clase.c     Codigo generado a partir de la clase.
+    profe.c     CODIGO DE MUESTRA PUBLICADO POR EL PROFESOR Vargas Castro Daniel.
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-CLASE 2D   8/26/21 
+9/7/21
+-------------------------------------------------------------------------------------
+                NOTAS PERSONALES
+-------------------------------------------------------------------------------------
+
+Writing an OpenGL Application:
+    ENTORNO DE OPENGL EN C/C++
+        If you are using C/C++, then you must first set up a build environment 
+        (Visual Studio project, GNU makefile, CMake file, etc) that can link to OpenGL.
+
+        Under Windows, you need to statically link to a library called OpenGL32.lib 
+        (note that you still link to OpenGL32.lib if you're building a 64-bit executable. 
+        The "32" part is meaningless). Visual Studio, and most Windows compilers, 
+        come with this library.
+
+    Initialization
+        Before you can actually use OpenGL in a program, 
+        you must first initialize it. Because OpenGL is platform-independent, 
+        there is not a standard way to initialize OpenGL; 
+        each platform handles it differently. 
+        Non-C/C++ language bindings can also handle these differently.
+
+        There are two phases of OpenGL initialization. 
+            The first phase is the creation of an OpenGL Context; 
+            the second phase is to load all of the necessary functions to use OpenGL. 
+            Some non-C/C++ language bindings merge these into one.
+        
+        OpenGL Context Creation:
+            An OpenGL context represents all of OpenGL. 
+            Creating one is very platform-specific, as well as language-binding specific.
+
+    REFERENCIA: https://www.khronos.org/opengl/wiki/Getting_Started (REPASO OBLIGADO)
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+CLASE 8/26/21 2D Graficación por Computadora con OpenGL    
 -------------------------------------------------------------------------------------
                 GENERACIÓN DE PUNTOS, LÍNEAS Y POLÍGONOS
               TEORÍA Y APLICACIÓN CON PRIMITIVAS DE OPENGL
@@ -287,7 +320,7 @@ POLIGONOS EN OpenGL:    VOID glBeging(GLenum mode);
         GL_QUAD_STRIP
         GL_POLYGON  :   POLIGONO CONVEXO
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-CLASE OpenGL 8/31/21 
+CLASE 8/31/21 Graficación por Computadora con OpenGL 
 **DOCUMENTAR EL PIPELINE DE RENDERIZADO Y LAS PROYECCIONES
 **DOCUMENTAR glViewport
 **VOLUMEN DE RENDERIZADO
@@ -606,3 +639,152 @@ habilitar o deshabilitar las capacidades de GL del lado del servidor.
             excepción de GL_DITHER y GL_MULTISAMPLE es GL_FALSE.
 
         REFERENCIA: https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glEnable.xml (REPASO OBLIGADO)
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+CLASE 9/2/21 Graficación por Computadora con OpenGL 
+**DOCUMENTAR ARCHIVOS .OBJ
+---------------------------------------------------------------------------------
+                            OBJETOS 3D
+             GENERACIÓN DE MALLAS POLIGONALES CON OPENGL
+---------------------------------------------------------------------------------
+
+MALLAS:
+    ES UNA COLECCION DE (COMPONENTES DE UNA MALLA) 
+        VERTICES
+        ARISTAS
+        POLIGONOS
+    QUE DEFINEN UN POLIEDRO.
+
+    PARA REPRESENTAR UN OBJETO EN 3D SE HACE USO DE LA
+    DISCRETIZACION MEDIANTE MALLAS POLIGONALES.
+
+    GEOMETRIA:
+        DEFINE COMO SE CONECTAN SUS COMPONENTES ENTRE SI.
+        GENERALMENTE SOLO DEFINEN LA SUPERFICIE DE LOS OBJETOS.
+    
+    TIPOS:
+        EN RENDERIZADO : MALLLAS DE TIANGULOS (TRIS).
+        EN ANIMACION Y MODELADO 3D : MALLAS DE CUADRILATEROS (QUADS).
+
+        Comúnmente se utilizan mallas que combinan triángulos y cuadriláteros.
+
+    ADVERTENCIA:
+        Por convención, un polígono se define indicando
+        sus vértices en sentido contrario a las manecillas
+        del reloj (Counter-Clock Wise o CCW), lo cual
+        permite definir su cara frontal.
+
+3D EN OPENGL:
+    Las primitivas de OpenGL son objetos 1D y 2D que sirven para representar 
+    puntos, líneas y polígonos en un espacio 2D o 3D.
+
+    ESPECIFICAR UN VERTICE (EN COORDENADAS DE MUNDO):
+        void glVertex3f(GLfloat x, GLfloat y, GLfloat z);
+    
+    EJEMP: Definir un plano normal al eje 𝑦 con lados de longitud L
+        void plano_xz(GLfloat L) 
+        {
+            glBegin(GL_QUADS);
+                glVertex3f(-L/2, 0, L/2);
+                glVertex3f(L/2, 0, L/2);
+                glVertex3f(L/2, 0, -L/2);
+                glVertex3f(-L/2, 0, -L/2);
+            glEnd();
+        }
+
+PRIMITIVAS GEOMETRICAS 3D CON GLUT EN MODO SOLIDO Y WIREFRAME:
+    CUBO
+        void glutSolidCube(GLdouble size);
+        void glutWireCube(GLdouble size);
+    ESFERA
+        void glutSolidSphere(GLdouble radius, GLint slices, GLint stacks);
+        void glutWireSphere(GLdouble radius, GLint slices, GLint stacks);
+    CONO
+        void glutSolidCone(GLdouble base, GLdouble height, GLint slices, GLint stacks);
+        void glutWireCone(GLdouble base, GLdouble height, GLint slices, GLint stacks);
+    TORO
+        void glutSolidTorus(GLdouble innerRadius, 
+                            GLdouble outerRadius,
+                            GLint nsides, 
+                            GLint rings);
+        void glutWireTorus(GLdouble innerRadius, 
+                           GLdouble outerRadius,
+                           GLint nsides, 
+                           GLint rings);
+
+GLU Models, otras primitivas de Glut:
+    GLU provides so called Quadrics objects:
+        disk
+        partial disk
+        sphere
+        cylinder
+    
+    gluCylinder
+        Three steps to create a cylinder:
+            1. Create a GLU quadric object
+                GLUquadricObj *p = gluNewQuadric();
+            2. Set to wire frame mode
+                gluQuadricDrawStyle(p,GLU__LINE); //o GLU_FILL 
+                ADVERTENCIA: **la presentacion no indica p
+            3. Derive a cylinder object from p
+                gluCylinder(p, base, top, height, slice, stacks);
+
+    REFERENCIA: 
+        https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluCylinder.xml
+        http://www.csc.villanova.edu/~mdamian/Past/graphicsfa10/notes/HierarchyHand.pdf
+        https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluQuadricDrawStyle.xml
+
+DISCRETIZACION DE UNA ESFERA:
+    SE DISCRETIZA EN BASE A SUS  PARAMETROS: 
+        RADIO
+        NUMERO DE PARALELOS  (stacks)
+        NUMERO DE MERIDIANOS (slices)
+    
+    ECUACIONES PARAMETRICAS DE UNA ESFERA
+        x_i = (r \cos(\phi_i))\cos\theta_i
+        y_i = (r \cos(\phi_i))\sin\theta_i
+        x_i = r\sin\theta_i
+
+        \theta_i es el angulo de meridiano y \phi_i el angulo del
+        paralelo deseado, discretizados mediante las ecuaciones:
+            \theta_i = 2\pi\frac{slice_i}{nSlices}
+            \phi = 2\pi\frac{stack_i}{nStacks}  **cambiar a español
+
+DISCRETIZACION DE UN CONO:
+    SE DISCRETIZA EN BASE A SUS  PARAMETROS:
+        ALTURA h
+        RADIO r
+        NUMERO DE VERTICES QUE FORMAN LA BASE n
+    
+    Las coordenadas de un vertice en el circulo que forma la base:
+        x_i = r\cos\theta_i
+        y_i = r\sen\theta_i
+        z_i = -\frac{h}{2}
+
+        donde   \theta_i = 2\pi\frac{i}{n}
+
+    EL VERTICE DE CONVERGENCIA DE TODAS LAS CARAS DEL CONO ES (0,0,\frac{h}{2})
+
+DISCRETIZACION DE UN CILINDRO:
+    SE DISCRETIZA EN BASE A SUS PARAMETROS:
+        ALTURA h
+        RADIO r
+        CANTIDAD DE VERTICES EN AMBAS BASES
+    
+    Las coordenadas de un vertice en el circulo que forman las bases:
+        x_i = r\cos\theta_i
+        y_i = r\sen\theta_i
+        z_i = \pm\frac{h}{2}
+
+        donde   \theta_i = 2\pi\frac{i}{n}
+
+DISCRETIZACIÓN DE UN TOROIDE
+    SE DISCRETIZA EN BASE A SUS PARAMETROS:
+        RADIO MEOR r
+        RADIO MAYOR R
+        NUMERO DE ANILLOS n
+    
+    veritce en su superficie:
+        x_i = (R + r\cos\alpha_i)\cos\beta_i
+        y_i = (R + r\cos\alpha_i)\sen\beta_i
+        z_i = r\sin\alpha_i

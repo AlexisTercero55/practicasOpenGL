@@ -17,7 +17,7 @@ ejecutables/
 *.slo
 *.lo
 *.o
-*.obj
+#*.obj
 *.ko
 *.obj
 *.elf
