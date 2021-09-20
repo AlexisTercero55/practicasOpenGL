@@ -4,7 +4,7 @@ Alexis Tercero: https://github.com/AlexisTercero55
 En este repositorio se alojan las practicas OpenGL de la clase de
 Graficación por Computadora Grupo:1752-Vargas Castro Daniel (UNAM/MAC).
 
-Mensage de commit: TRANSFORMACIONES AFINES TEORIA.
+Mensage de commit: TRANSFORMACIONES Y MODELADO 3D BÁSICO
 
 OpenGL: version 2.1
 
@@ -23,9 +23,18 @@ Visual Studio Code @\.vscode:
     launch.json: Define la tarea de debugging que se activa con f5.
 
 ARCHIVOS:
-    **
-    clase.c     Codigo generado a partir de la clase.
-    profe.c     CODIGO DE MUESTRA PUBLICADO POR EL PROFESOR Vargas Castro Daniel.
+    tarea2.c                Practica sobre trasnformaciones afines y modelado jerarquico.
+
+    trasnformaciones3D.c    CODIGO MUESTRA DE TRANSFORMACIONES AFINES
+                            PUBLICADO POR EL PROFESOR Vargas Castro Daniel.
+
+    modelado_jerarquico.c   CODIGO MUESTRA DE TECNICAS DE MODELADO
+                            PUBLICADO POR EL PROFESOR Vargas Castro Daniel.
+
+    clase.c                 Codigo generado a partir de la clase del dia 9/2/21.
+
+    primitivas.c            CODIGO MUESTRA DE PRIMITIVAS GEOMETRICAS
+                            PUBLICADO POR EL PROFESOR Vargas Castro Daniel.
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 9/7/21
@@ -388,8 +397,9 @@ PROYECIONES:
                 
                 NOTAS ADICIONALES DE LA PILA DE MATRICES (O VALORES DE GLenum mode):
                     The model, view and projection matrices are three separate matrices. 
-                    Model maps from an object's local coordinate space into world space, 
-                    view from world space to camera space, projection from camera to screen.
+                        Model maps from an object's local coordinate space into world space. 
+                        View from world space to camera space.
+                        Projection from camera to screen.
                     
                     If you compose all three, you can use the one result to map all the way 
                     from object space to screen space, making you able to work out what you 
@@ -791,8 +801,7 @@ DISCRETIZACIÓN DE UN TOROIDE
         z_i = r\sin\alpha_i
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-CLASE 9/7/21 Graficación por Computadora con OpenGL <<terminar apuntes de presentacion antes del commit>>
-**actual commit 
+CLASE 9/7/21 Graficación por Computadora con OpenGL
 **como sustituyen las operaciones con coordenadas homogeneas a las transformaciones afines?
 **https://www.youtube.com/watch?v=WDIkqP4JbkE
 ---------------------------------------------------------------------------------
@@ -1013,3 +1022,118 @@ TRANSFORMACIONES AFINES CON COORDENADAS HOMOGÉNEAS:
                 0   &  0  & S_z &  0\\
                 0   &  0  &  0  &  1 
             \end{pmatrix}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+CLASE 9/9/21 Graficación por Computadora con OpenGL
+** Dividir el programa tarea2.c en modulos y headers
+** Hacer el archivo make para la tarea de compilacion.
+---------------------------------------------------------------------------------
+                      MODELADO 3D BÁSICO
+CREACIÓN DE OBJETOS 3D A PARTIR DE PRIMITIVAS Y TRANSFORMACIONES GEOMÉTRICAS
+---------------------------------------------------------------------------------
+
+MATRICES DE OPENGL:
+    Por defecto, todas las operaciones se realizan sobre la matriz de coordenadas de mundo, 
+    llamada modelview.
+
+    Es posible multiplicar la matriz modelview por una matriz arbitraria 
+    mediante las funciones:
+
+        void glMultMatrixf(const GLfloat * m);
+        void glMultMatrixd(const GLdouble * m);
+
+        m es un arreglo de 16 elementos, cuyos valores representan 
+        cada uno de los valores de la matriz a multiplicar en coordenadas homogéneas.
+    
+    OpenGL maneja una pila de matrices que se puede utilizar para guardar el estado 
+    de una matriz. Todas las operaciones de matrices se realizarán sobre la matriz 
+    que esta al tope de la pila.
+
+        Para poner una copia de la matriz actual en el tope de la pila, 
+        se utiliza la función:
+            
+            void glPushMatrix(void);
+
+        Para remover la matriz del tope de la pila, 
+        se utiliza la función:
+            
+            void glPopMatrix(void);
+    
+    EJEMPLO DE USO DE LA PILA DE MATRICES:
+        función() 
+        {   // La matriz por defecto en la pila es MODELVIEW : M
+            glMultMatrix(A);    // MA
+            glMultMatrix(B);    // MAB
+            glPushMatrix();     // MAB, MAB
+            glPushMatrix();     // MAB, MAB, MAB
+            glMultMatrix(C);    // MAB, MAB, MABC
+            glPopMatrix();      // MAB, MAB
+            glMultMatrix(D);    // MAB, MABD
+            glPopMatrix();      // MAB
+            glMultMatrix(E);    // MABE
+            glPushMatrix();     // MABE, MABE
+            glMultMatrix(F);    // MABE, MABEF
+            glPopMatrix();      // MABE
+        }
+
+COORDENADAS LOCALES Y GLOBALES:
+
+    Se puede simular el uso de coordenadas locales y globales en OpenGL 
+    mediante las funciones
+    
+        glPushMatrix y glPopMatrix, 
+    
+    haciendo un push y un pop de matrices por cada objeto en la escena. 
+    
+    Por ejemplo, si se tienen n objetos en la escena, se pueden hacer n sistemas de
+    coordenadas locales (uno para cada objeto) de la forma:
+
+        void dibujar() 
+        {
+            //Transformaciones al mundo
+            glPushMatrix();
+                //TRANSFORMACIONES EN COORDENADAS LOCALES
+                //Primitivas y transformaciones del objeto 1.
+            glPopMatrix();
+
+            glPushMatrix();
+                //TRANSFORMACIONES EN COORDENADAS LOCALES
+                //Primitivas y transformaciones del objeto 2.
+            glPopMatrix();
+
+            //...
+
+            glPushMatrix();
+                //TRANSFORMACIONES EN COORDENADAS LOCALES
+                //Primitivas y transformaciones del objeto n.
+            glPopMatrix();
+        }
+
+MODELADO JERARQUICO:
+
+    Basicamente el modelado jerarquico consiste en una serie de
+    trasformacionciones y creacion de objetos que dependen de otros
+    formando una estructura de arbol, donde el nodo raiz es el objeto
+    concreto que se quiere modelar, los nodos hijos son sus partes 
+    componentes los cuales a su vez se componenen de primitivas graficas
+    asi de la misma manera hasta llegar a sus hojas que son primitivas graficas. 
+        glPushMatrix();
+            //TRANSFORMACIONES EN COORDENADAS LOCALES
+            //Primitivas y transformaciones del objeto 1.
+
+            glPushMatrix();
+                //TRANSFORMACIONES EN COORDENADAS LOCALES
+                //Primitivas y transformaciones del objeto 1.1.
+
+                glPushMatrix();
+                    //TRANSFORMACIONES EN COORDENADAS LOCALES
+                    //Primitivas y transformaciones del objeto 1.1.1.
+                glPopMatrix();
+            glPopMatrix();
+        glPopMatrix();
+    
+    Vease los archivos:
+        modelado_jeraraquico.c 
+        tarea2.c 
+        
+        para una demostracion concreta.
